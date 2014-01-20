@@ -19,36 +19,38 @@ int main( int argc, char** argv )
     while(cap.isOpened())
 	{
 		Mat in=Mat::zeros(image.rows, image.cols, CV_8UC3);
-		cap>>in;
+		cap.grab();
+		cap.retrieve(in);
 		Mat image;
 		Mat image_bw;
 		cvtColor(in, image_bw, CV_RGB2GRAY);
-		adaptiveThreshold(image_bw, image, 190, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 5, -10);
-		if(image.empty()) break;
-
-		Mat dest = Mat::zeros(image.rows, image.cols, CV_8UC3);
-		image=image > 1;
+		imshow("Input", image_bw);
+		adaptiveThreshold(image_bw, image, 245, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 7, -5);
+		imshow("intermediate", image);
+		Mat dest =Mat::zeros(in.size(), CV_32FC3);
+		
 		vector<vector<Point> > contours;
 		vector<Vec4i> hierarchy;
-		findContours(image, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
-		
+		findContours(image, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_TC89_KCOS);
 
-		for (int i = 0; i>=0; i=hierarchy[i][0])
-		{
-			Scalar color(rand()&255, rand()&255, rand()&255);
-			drawContours( dest, contours, i, color, CV_FILLED, 8, hierarchy);
-		}
-		
 		imshow("Display window", image); // Show our image inside it.
-		imshow("Input", in);
-		imshow("intermediate", image_bw);
+		for(int i =0; i<contours.size(); i++)
+		{
+			while( (contours[i].size() < 4 )&&(contours.size()>i)) { //if not a rectangle or larger...
+				contours.erase(contours.begin()+i);
+			}
+		}
 		if(waitKey(30) >=0) break;
 	}
 	}
-	catch (std::exception& e) {
-		cout << e.what();
-		return 1;
+	catch (cv::Exception& e) {
+		cout <<"CV_ERROR: " << e.what();
 	}
+	catch (std::exception& e) {
+		cout << "ERROR: " << e.what();
+		
+	}
+	
 	
     waitKey(0);
     return 0;
