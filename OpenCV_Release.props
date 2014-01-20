@@ -5,11 +5,11 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalLibraryDirectories>Y:\2014 Season\2014 Programming\OpenCV\opencv\build\x86\vc10\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_core248.lib;opencv_imgproc248.lib;opencv_highgui248.lib;opencv_ml248.lib;opencv_video248.lib;opencv_features2d248.lib;opencv_calib3d248.lib;opencv_objdetect248.lib;opencv_contrib248.lib;opencv_legacy248.lib;opencv_flann248.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>Y:\2014 Season\2014 Programming\OpenCV\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OPENCV_DIR)\..\..\include</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
