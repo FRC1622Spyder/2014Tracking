@@ -8,7 +8,7 @@ using namespace std;
 #define G_ 1
 #define B_ 0
 
-#define LIVE_CAP //uncomment for axis camera use
+//#define LIVE_CAP //uncomment for axis camera use
 
 int main( int argc, char** argv )
 {
@@ -32,11 +32,6 @@ int main( int argc, char** argv )
 #ifdef LIVE_CAP
 		cout << "get image" <<endl;
 		cap >> in;
-#else
-		in = imread("cap_sample.jpg");
-#endif
-		Mat image;
-		vector<Mat> images;
 		if(in.cols==0)
 		{
 			cout << "got null image. re-opening stream." << endl;
@@ -46,6 +41,11 @@ int main( int argc, char** argv )
 			cap >> in;
 			if( in.cols==0) break;
 		}
+#else
+		in = imread("image.jpg");
+#endif
+		Mat image;
+		vector<Mat> images;
 		cout << "split" <<endl;
 		split(in, images);
 		imshow("Input-b1", images[B_]);
