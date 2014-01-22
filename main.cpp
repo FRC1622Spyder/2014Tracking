@@ -65,7 +65,7 @@ int main( int argc, char** argv )
 			);
 		drawKeypoints(in, v.centers, drawing, Scalar(0,0,255));
 	}
-	imshow("contour", drawing);
+	
 
 	
 	for(unsigned int i = 0; i<v.centers.size(); i++)
@@ -82,7 +82,7 @@ int main( int argc, char** argv )
 		cout << "[" << i << "] " << v.centers[i].pt <<" ["<<v.boundRect[i].area()<<"] "<<v.rCenters[i]<<endl;
 	}
 #endif
-	
+	imshow("contour", drawing);
 	v.~Vision();
 
 #ifdef LIVE_CAP
