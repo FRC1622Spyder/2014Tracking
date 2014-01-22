@@ -5,15 +5,10 @@
 #include "Vision.h"
 using namespace cv;
 using namespace std;
-#define R_ 2
-#define G_ 1
-#define B_ 0
-
 
 // NOTES:
 // Keeping the object count down by filtering by size
-// 
-
+// will keep the processing speed up.
 
 //#define LIVE_CAP //uncomment for axis camera use
 void reopen(VideoCapture cap)
@@ -52,7 +47,6 @@ int main( int argc, char** argv )
 		v.filterContours();
 		v.drawCenters();
 
-		//#ifdef _DEBUG //debugging output
 		cout<<"rows: " << in.rows << " cols: " << in.cols<<endl;
 		cout<<"[ID] [CenterX,CenterY] [Apparent Size (px.)] [relative position to center]"<<endl;
 		try{
@@ -64,9 +58,7 @@ int main( int argc, char** argv )
 		catch(Exception &e)
 		{
 			cout<<e.what();
-
 		}
-		//#endif
 		imshow("contour", v.getDrawing());
 		v.~Vision();
 
