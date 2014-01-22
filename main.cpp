@@ -39,7 +39,6 @@ int main( int argc, char** argv )
 		}
 #else
 		in = imread("image.jpg");
-
 #endif
 		Vision v(in);
 		v.doThreshold();
@@ -58,6 +57,7 @@ int main( int argc, char** argv )
 		catch(Exception &e)
 		{
 			cout<<e.what();
+			exit(2);
 		}
 		imshow("contour", v.getDrawing());
 		v.~Vision();

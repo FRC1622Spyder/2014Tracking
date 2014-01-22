@@ -1,5 +1,6 @@
 
 #include "stdafx.h"
+#include <stdlib.h>
 #include "Vision.h"
 
 Vision::Vision()
@@ -166,9 +167,13 @@ void Vision::processContours()
 void Vision::doThreshold()
 {
 	split(this->in, this->images);
-
+	if(images.size() == 0) // this shouldn't ever happen.
+	{
+		abort(); // split failed? Nothing to do here.s
+	}
 	imshow("Input-b1", this->images[B_]);
-
+	
+	
 	//still debating about wether to use normal or adaptive thresholds.
 	//adaptiveThreshold(this->images[B_], this->images[B_], 245, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, this->adaptThresholdVoxSz, this->adaptThresholdDiff);//21, -10
 	threshold(this->images[B_], this->images[B_], this->thresholdMin, this->thresholdMax, THRESH_BINARY);//230, 255

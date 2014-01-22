@@ -43,4 +43,5 @@ ipch/
 [Bb]in
 [Dd]ebug*/
 [Rr]elease*/
+x64*/
 Ankh.NoLoad
