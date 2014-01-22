@@ -15,7 +15,7 @@ using namespace std;
 // 
 
 
-#define LIVE_CAP //uncomment for axis camera use
+//#define LIVE_CAP //uncomment for axis camera use
 void reopen(VideoCapture cap)
 {
 	cap.release();
