@@ -32,7 +32,7 @@ public:
 	~Vision(void);
 	void filterContours();
 	void processContours();
-	void threshold();
+	void doThreshold();
 };
 
 //for reference:

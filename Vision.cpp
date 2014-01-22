@@ -20,58 +20,71 @@ Vision::~Vision(void)
 
 }
 
-
+//FIXME: error handling for when no contours are detected.
 void Vision::filterContours()
 {
+	try{
+		if(contours.size() !=0){
 	for(unsigned int j =0; j < this->contours.size(); j++) // trim the extraneous contours
 	{
-		while((this->contours[j].size() <= 4 )&&(j < this->contours.size())) { //if chain contains less than 4 points				
+		while((this->contours[j].size() <= 4 )&&(j+1 < this->contours.size())) { //if chain contains less than 4 points				
 			this->contours.erase(this->contours.begin()+j);
 			this->hierarchy.erase(this->hierarchy.begin()+j);
 		}
 	}
 
-	for(unsigned int i = 0; i < this->contours.size(); i++ )
-	{ 
-		approxPolyDP( Mat(this->contours[i]), this->contours_poly[i], 3, true );
-		this->boundRect[i] = boundingRect( Mat(this->contours_poly[i]) );
-	}
-
+	//for(unsigned int i = 0; i < this->contours.size(); i++ )
+	//{ 
+	//	approxPolyDP( Mat(this->contours[i]), this->contours_poly[i], 3, true );
+	//	this->boundRect[i] = boundingRect( Mat(this->contours_poly[i]) );
+	//}
+	
 	for(unsigned int j =0; j < this->contours.size(); j++) // trim the extraneous bounding boxes
 	{
-		while(((5000.0f<this->boundRect[j].area())||(2000.0f>this->boundRect[j].area()))&&(j < this->contours.size())) { //a sort of band pass filter for rectangle area.			
+		while(((5000.0f<this->boundRect[j].area())||(2000.0f>this->boundRect[j].area()))&&(j+1 < this->contours.size())) { //a sort of band pass filter for rectangle area.			
 			this->contours.erase(this->contours.begin()+j);
 			this->hierarchy.erase(this->hierarchy.begin()+j);
 			this->boundRect.erase(this->boundRect.begin()+j);
 		}
 	}
+	}
+	}
+	catch(Exception &e){
+		cout<<e.what();}
 }
 
 
 void Vision::processContours()
 {
+	
 	Canny( this->images[B_], this->images[B_], this->thresh, this->thresh*2, 3 ); //edge detection
 
 	// Find contours
 	findContours( this->images[B_], this->contours, this->hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 	
-	vector<vector<Point> > contours_poly_( this->contours.size() );
-	this->contours_poly=contours_poly_;
+	
+	
 	this->boundRect.resize( this->contours.size() );
 	this->center.resize( this->contours.size() );
+	this->contours_poly.resize( this->contours.size() );
+	for(unsigned int i = 0; i < this->contours.size(); i++ )
+	{ 
+		approxPolyDP( Mat(this->contours[i]), this->contours_poly[i], 3, true );
+		this->boundRect[i] = boundingRect( Mat(this->contours_poly[i]) );
+	}
 }
 
 
-void Vision::threshold()
+void Vision::doThreshold()
 {
 	split(this->in, this->images);
-#ifdef _DEBUG
-	imshow("Input-b1", images[B_]);
-#endif
+//#ifdef _DEBUG
+	imshow("Input-b1", this->images[B_]);
+//#endif
 	//still debating about wether to use normal or adaptive thresholds.
-	adaptiveThreshold(this->images[B_], this->images[B_], 245, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 21, -10);
-	//threshold(this->images[B_], this->images[B_], 230, 255, THRESH_BINARY);
-#ifdef _DEBUG
-	imshow("Input-b2", images[B_]);
-#endif
+	//adaptiveThreshold(this->images[B_], this->images[B_], 245, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 21, -10);
+	threshold(this->images[B_], this->images[B_], 230, 255, THRESH_BINARY);
+//#ifdef _DEBUG
+	imshow("Input-b2", this->images[B_]);
+//#endif
 }
