@@ -182,24 +182,28 @@ void Vision::doThreshold()
 
 void Vision::drawCenters()
 {
-
-	for(unsigned int i = 0; i< this->contours.size(); i++ )
+	if(this->contours.size() != 0)
 	{
-		drawContours( this->in, this->contours, i, Scalar( 255, 0,0 ), 1, 8, this->hierarchy, 0, Point() );
-		rectangle( in, this->boundRect[i].tl(), this->boundRect[i].br(), Scalar(0,255,0), 1, 8, 0 );
-		float xavg = 0.0f;
-		float yavg = 0.0f;
-		xavg=(float)((this->boundRect[i].tl().x) + this->boundRect[i].br().x)/2;
-		yavg=(float)((this->boundRect[i].tl().y) + this->boundRect[i].br().y)/2;
-		this->centers.push_back(
-			KeyPoint(xavg, yavg, 1.0f));
-		drawKeypoints(this->in, this->centers, this->drawing, Scalar(0,0,255));
-	}
-	for(unsigned int i = 0; i < this->centers.size(); i++)
-	{
-		this->rCenters.push_back(Point2f(
-			((this->centers[i].pt.x-this->centerX)*(2/(float)in.cols)), 
-			((this->centers[i].pt.y-this->centerY)*(2/(float)in.rows))));
+		for(unsigned int i = 0; i< this->contours.size(); i++ )
+		{
+			drawContours( this->in, this->contours, i, Scalar( 255, 0,0 ), 1, 8, this->hierarchy, 0, Point() );
+			rectangle( in, this->boundRect[i].tl(), this->boundRect[i].br(), Scalar(0,255,0), 1, 8, 0 );
+			float xavg = 0.0f;
+			float yavg = 0.0f;
+			xavg=(float)((this->boundRect[i].tl().x) + this->boundRect[i].br().x)/2;
+			yavg=(float)((this->boundRect[i].tl().y) + this->boundRect[i].br().y)/2;
+			this->centers.push_back(
+				KeyPoint(xavg, yavg, 1.0f));
+			drawKeypoints(this->in, this->centers, this->drawing, Scalar(0,0,255));
+		}
+		for(unsigned int i = 0; i < this->centers.size(); i++)
+		{
+			this->rCenters.push_back(Point2f(
+				((this->centers[i].pt.x-this->centerX)*(2/(float)in.cols)), 
+				((this->centers[i].pt.y-this->centerY)*(2/(float)in.rows))));
+		}
+	} else {
+		this->drawing = this->in;
 	}
 }
 
