@@ -10,7 +10,7 @@ using namespace std;
 // Keeping the object count down by filtering by size
 // will keep the processing speed up.
 
-//#define LIVE_CAP //uncomment for axis camera use
+#define LIVE_CAP //uncomment for axis camera use
 void reopen(VideoCapture cap)
 {
 	cap.release();
@@ -43,7 +43,7 @@ int main( int argc, char** argv )
 		Vision v(in);
 		v.doThreshold();
 		v.processContours();
-		v.filterContours();
+		v.filterContours(); 
 		v.drawCenters();
 
 		cout<<"rows: " << in.rows << " cols: " << in.cols<<endl;
@@ -54,12 +54,25 @@ int main( int argc, char** argv )
 				cout << "[" << i << "] " << v.getCenters()[i].pt <<" ["<<v.getBoundRect()[i].area()<<"] "<<v.getRCenters()[i]<<endl;
 			}
 		}
-		catch(Exception &e)
+		
+		catch(cv::Exception &e)
 		{
 			cout<<e.what();
 			exit(2);
 		}
-		imshow("contour", v.getDrawing());
+		catch(std::exception &e)
+		{
+			cout<<e.what();
+			exit(2);
+		}
+		Mat d = v.getDrawing();
+		if(((d.size().width>0 && d.size().height>0)))
+		{
+			imshow("contour", d);
+			
+		} else {
+			cout << "getDrawing returned null image"<<endl;
+		}
 		v.~Vision();
 
 #ifdef LIVE_CAP

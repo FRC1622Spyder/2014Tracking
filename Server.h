@@ -23,10 +23,11 @@ class Server
 	char recvBuf[BUF_LEN];
 	int recvBufLen;
 	int Listen();
-
-	
-public:
+	int Recv();
 	int Accept();
+	void respond();
+public:
+	
 	Server();
 	~Server();
 
