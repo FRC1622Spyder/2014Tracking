@@ -3,6 +3,7 @@
 #include <opencv\cv.h>
 #include <exception>
 #include "Vision.h"
+#include "Server.h"
 using namespace cv;
 using namespace std;
 
@@ -46,12 +47,22 @@ int main( int argc, char** argv )
 		v.filterContours(); 
 		v.drawCenters();
 
+		vector<VisionPacketEntry> packet;
+
 		cout<<"rows: " << in.rows << " cols: " << in.cols<<endl;
 		cout<<"[ID] [CenterX,CenterY] [Apparent Size (px.)] [relative position to center]"<<endl;
 		try{
 			for(unsigned int i = 0; i < v.getCenters().size(); i++)
 			{
+				struct VisionPacketEntry ent;
 				cout << "[" << i << "] " << v.getCenters()[i].pt <<" ["<<v.getBoundRect()[i].area()<<"] "<<v.getRCenters()[i]<<endl;
+				ent.area = v.getBoundRect()[i].area();
+				ent.id = i;
+				ent.centerX = v.getCenters()[i].pt.x;
+				ent.centerY = v.getCenters()[i].pt.y;
+				ent.rCenterX = v.getRCenters()[i].x;
+				ent.rCenterY = v.getRCenters()[i].y;
+				packet.push_back(ent);
 			}
 		}
 		

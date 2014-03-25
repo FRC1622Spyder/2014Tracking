@@ -11,6 +11,7 @@ Server::Server()
 	this->client = INVALID_SOCKET;
 	this->result = NULL;
 	this->recvBufLen = BUF_LEN;
+	this->sendBufLen = BUF_LEN;
 
 	this->iRes = WSAStartup(MAKEWORD(2,2), &this->wsaData);
 	if(iRes !=0) 
@@ -80,6 +81,22 @@ int Server::Recv()
 	} while(this->iRes >0);
 }
 
+int Server::respond()
+{
+	
+
+	//send contents of sendBuf.
+	int iSRes = send(this->client, this->sendBuf, this->sendBufLen, 0);
+	if(iSRes == SOCKET_ERROR)
+	{
+		cout << "send failed with error: " << WSAGetLastError() << endl;
+		closesocket(this->client);
+		WSACleanup();
+		return 1;
+	}
+	cout << "Bytes sent: " << iSRes << endl;
+}
+
 int Server::Listen()
 {
 	//blocking call
@@ -102,7 +119,7 @@ int Server::Accept()
 		cout << "accept failed with error: " << WSAGetLastError() << endl;
 		closesocket(this->client);
 		WSACleanup();
-		return;
+		return 1;
 	}
 }
 
@@ -118,4 +135,10 @@ Server::~Server()
 	}
 	closesocket(this->client);
 	WSACleanup();
+}
+
+int Server::sendPacket(vector<VisionPacketEntry> *p)
+{
+	this->sendBuf = reinterpret_cast<char*>(p); //this is probably on that list
+	this->sendBufLen = sizeof(&p);              //of things one should never do.
 }
