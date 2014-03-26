@@ -2,8 +2,10 @@
 #include "stdafx.h"
 #include <opencv\cv.h>
 #include <exception>
+#include "config.h"
 #include "Vision.h"
 #include "Server.h"
+
 using namespace cv;
 using namespace std;
 
@@ -11,7 +13,7 @@ using namespace std;
 // Keeping the object count down by filtering by size
 // will keep the processing speed up.
 
-#define LIVE_CAP //uncomment for axis camera use
+
 void reopen(VideoCapture cap)
 {
 	cap.release();
@@ -19,6 +21,7 @@ void reopen(VideoCapture cap)
 }
 int main( int argc, char** argv )
 {
+	Server srv;
 	int counter = 0;
 	namedWindow( "contour", WINDOW_AUTOSIZE);
 	namedWindow( "Input-b1", WINDOW_AUTOSIZE);
@@ -63,6 +66,7 @@ int main( int argc, char** argv )
 				ent.rCenterX = v.getRCenters()[i].x;
 				ent.rCenterY = v.getRCenters()[i].y;
 				packet.push_back(ent);
+				srv.sendPacket(packet);
 			}
 		}
 		
