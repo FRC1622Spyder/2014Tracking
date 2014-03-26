@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "Server.h"
+#include <sstream>
+#include <iostream>
+#include <iomanip>
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -7,57 +10,68 @@
 using namespace std;
 Server::Server()
 {
-	this->sockListen = INVALID_SOCKET;
-	this->client = INVALID_SOCKET;
-	this->result = NULL;
-	this->recvBufLen = BUF_LEN;
-	this->sendBufLen = BUF_LEN;
+	this->sd = INVALID_SOCKET;
+	
+	result = NULL;
+	recvBufLen = BUF_LEN;
+	sendBufLen = BUF_LEN;
 
-	this->iRes = WSAStartup(MAKEWORD(2,2), &this->wsaData);
+	iRes = WSAStartup(MAKEWORD(2,2), &wsaData);
 	if(iRes !=0) 
 	{
 		cout<<"WSAStartup failed: " << iRes	<<endl;
 		return;
 	}
 
-	ZeroMemory(&this->hints, sizeof(this->hints));
-	this->hints.ai_family = AF_INET;
-	this->hints.ai_socktype = SOCK_DGRAM;
-	this->hints.ai_protocol = IPPROTO_UDP;
-	this->hints.ai_flags = AI_PASSIVE;
 
-	this->iRes = getaddrinfo(NULL, PORT, &this->hints, &this->result);
-	if(this->iRes !=0)
+	this->sd = socket(AF_INET, SOCK_DGRAM, 0);
+	if(sd == INVALID_SOCKET)
 	{
-		cout<< "getaddrinfo failed with error: " << this->iRes << endl;
-		return;
-	}
-
-	this->sockListen = socket(this->result->ai_family, this->result->ai_socktype, this->result->ai_protocol);
-	if(this->sockListen == INVALID_SOCKET)
-	{
-		cout << "socket failed with error: " << WSAGetLastError() << endl;
-		return;
-	}
-
-	this->iRes = bind(this->sockListen, this->result->ai_addr, (int)this->result->ai_addrlen);
-	if(this->iRes == SOCKET_ERROR)
-	{
-		cout << "bind failed with error: " << WSAGetLastError() <<endl;
-		freeaddrinfo(this->result);
-		closesocket(this->sockListen);
+		cout << "socket creation failed: " << WSAGetLastError() << endl;
+		closesocket(this->sd);
 		WSACleanup();
-		return;
 	}
 
-	freeaddrinfo(this->result);
+	memset((void *)&server, '\0', sizeof(struct sockaddr_in));
+	server.sin_family=AF_INET;
+	server.sin_port=htons(PORT);
 
-	this->Listen();
-	this->Accept();
-	this->Recv();
-	
+	server.sin_addr.S_un.S_un_b.s_b1 = (unsigned char)192;
+	server.sin_addr.S_un.S_un_b.s_b2 = (unsigned char)168;
+	server.sin_addr.S_un.S_un_b.s_b3 = (unsigned char)1;
+	server.sin_addr.S_un.S_un_b.s_b4 = (unsigned char)60;
+
+	if(bind(this->sd,(struct sockaddr *) &server, sizeof(struct sockaddr_in)) ==-1)
+	{
+		cout << "bind failed: " << WSAGetLastError() << endl;
+		closesocket(sd);
+		WSACleanup();
+	}
+	memset((void*)&this->recvBuf, '\0', sizeof(char)*512);
+	int client_length = (int)sizeof(struct sockaddr_in);
+	//blocking call
+	int bytes_received = recvfrom(this->getSock(), this->recvBuf, recvBufLen, 0,
+		(struct sockaddr *)&client, &client_length);
+
+	cout << "got: " << this->recvBuf << " from: " << 
+		inet_ntoa(this->client.sin_addr) <<":"<< ntohs(client.sin_port) << endl;
+	if (bytes_received < 0)
+	{
+		cout << "Could not receive datagram: " << WSAGetLastError() << endl;
+		closesocket(sd);
+		WSACleanup();
+   
+	}
 }
 
+
+SOCKET Server::getSock()
+{
+	const SOCKET sock = this->sd;
+	return sock;
+}
+
+/*
 int Server::Recv()
 {
 	do {
@@ -79,66 +93,67 @@ int Server::Recv()
 			return 1;
 		}
 	} while(this->iRes >0);
-}
+	return 0;
+}*/
 
 int Server::respond()
 {
-	
-
 	//send contents of sendBuf.
-	int iSRes = send(this->client, this->sendBuf, this->sendBufLen, 0);
+	int iSRes = sendto(this->sd, (char*)&this->sendBuf, (int)this->sendBufLen, 0,
+		(struct sockaddr*)&this->client, sizeof(this->client));
 	if(iSRes == SOCKET_ERROR)
 	{
 		cout << "send failed with error: " << WSAGetLastError() << endl;
-		closesocket(this->client);
+		closesocket(this->sd);
 		WSACleanup();
 		return 1;
 	}
 	cout << "Bytes sent: " << iSRes << endl;
+	return 0;
 }
 
-int Server::Listen()
-{
-	//blocking call
-	this->iRes = listen(this->sockListen, SOMAXCONN);
-	if(this->iRes == SOCKET_ERROR)
-	{
-		cout << "listen failed with error: " << WSAGetLastError() <<endl;
-		closesocket(this->sockListen);
-		WSACleanup();
-		return 1;
-	}
-}
-
-int Server::Accept()
-{
-	//blocking call
-	this->client = accept(this->sockListen, NULL, NULL);
-	if(client == INVALID_SOCKET)
-	{
-		cout << "accept failed with error: " << WSAGetLastError() << endl;
-		closesocket(this->client);
-		WSACleanup();
-		return 1;
-	}
-}
 
 Server::~Server()
 {
-	this->iRes = shutdown(this->client, SD_SEND);
+	this->iRes = shutdown(this->sd, SD_SEND);
 	if(this->iRes == SOCKET_ERROR)
 	{
 		cout << "shutdown failed with error: " << WSAGetLastError() << endl;
-		closesocket(this->client);
+		closesocket(this->sd);
 		WSACleanup();
 		return;
 	}
-	closesocket(this->client);
+	closesocket(this->sd);
 	WSACleanup();
 }
 
-int Server::sendPacket(vector<VisionPacketEntry> *p)
+int Server::sendPacket(vector<VisionPacketEntry> p)
 {
-	this->sendBuf = reinterpret_cast<char*>(p); //this is probably on that list
-	this->sendBufLen = sizeof(&p);              //of things one should never do.
+	stringstream ss;
+	/// each field consists of 16 characters, first 8 for an ident,
+	/// second 8 for the value.
+	/// any remaing spaces are '0' filled.
+	ss 
+		<<  setfill('0') << right //fill right of data with '0'
+		<< setw(8) << "ID"
+		<< setw(8) << p[0].id 
+		<< setw(8) << "centerX"
+		<< setw(8) << p[0].centerX
+		<< setw(8) << "centerY"
+		<< setw(8) << p[0].centerY
+		<< setw(8) << "area"
+		<< setw(8) << p[0].area
+		<< setw(8) << "rCenterX"
+		<< setw(8) << p[0].rCenterX
+		<< setw(8) << "rCenterY"
+		<< setw(8) << p[0].rCenterY
+		;
+	string buf = ss.str();
+	this->sendBuf = buf.c_str();
+	this->sendBufLen = buf.length();
+	this->respond();
+	//this->Listen();
+	//this->Accept();
+	//this->Recv();
+	return 0;
 }

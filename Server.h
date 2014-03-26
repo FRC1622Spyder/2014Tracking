@@ -1,6 +1,6 @@
 
 #include "stdafx.h"
-
+#include <sstream>
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <WinSock2.h>
@@ -10,7 +10,7 @@
 #include <vector>
 
 #define BUF_LEN 512
-#define PORT "60"
+#define PORT 60
 
 struct VisionPacketEntry
 {
@@ -26,21 +26,24 @@ class Server
 {
 	WSADATA wsaData;
 	int iRes;
-	SOCKET sockListen;
-	SOCKET client;
+	int client_length;
+	sockaddr_in server;
+	sockaddr_in client;
+	SOCKET sd;
 	struct addrinfo *result;
 	struct addrinfo hints;
 	int sendRes;
 	char recvBuf[BUF_LEN];
 	int recvBufLen;
-	char *sendBuf;
+	const char *sendBuf;
 	int sendBufLen;
-	int Listen();
-	int Recv();
-	int Accept();
+	//int Listen();
+	//int Recv();
+	//int Accept();
 	int respond();
+	SOCKET getSock();
 public:
-	int sendPacket(std::vector<VisionPacketEntry> *p);
+	int sendPacket(std::vector<VisionPacketEntry> p);
 	Server();
 	~Server();
 
