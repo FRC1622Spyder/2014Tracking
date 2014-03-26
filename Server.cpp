@@ -128,7 +128,7 @@ Server::~Server()
 	WSACleanup();
 }
 
-int Server::sendPacket(vector<VisionPacketEntry> p)
+int Server::sendPacket(VisionPacketEntry p)
 {
 	stringstream ss;
 	/// each field consists of 16 characters, first 8 for an ident,
@@ -137,17 +137,18 @@ int Server::sendPacket(vector<VisionPacketEntry> p)
 	ss 
 		<<  setfill('0') << right //fill right of data with '0'
 		<< setw(8) << "ID"
-		<< setw(8) << p[0].id 
+		<< setw(8) << p.id 
 		<< setw(8) << "centerX"
-		<< setw(8) << p[0].centerX
+		<< setw(8) << p.centerX
 		<< setw(8) << "centerY"
-		<< setw(8) << p[0].centerY
+		<< setw(8) << p.centerY
 		<< setw(8) << "area"
-		<< setw(8) << p[0].area
+		<< setw(8) << p.area
 		<< setw(8) << "rCenterX"
-		<< setw(8) << p[0].rCenterX
+		<< setw(9) << p.rCenterX
 		<< setw(8) << "rCenterY"
-		<< setw(8) << p[0].rCenterY
+		<< setw(9) << p.rCenterY 
+		<< endl
 		;
 	string buf = ss.str();
 	this->sendBuf = buf.c_str();

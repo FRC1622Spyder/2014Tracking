@@ -65,8 +65,8 @@ int main( int argc, char** argv )
 				ent.centerY = v.getCenters()[i].pt.y;
 				ent.rCenterX = v.getRCenters()[i].x;
 				ent.rCenterY = v.getRCenters()[i].y;
-				packet.push_back(ent);
-				srv.sendPacket(packet);
+				srv.sendPacket(ent);
+				Sleep(10);
 			}
 		}
 		

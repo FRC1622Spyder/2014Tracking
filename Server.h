@@ -43,7 +43,7 @@ class Server
 	int respond();
 	SOCKET getSock();
 public:
-	int sendPacket(std::vector<VisionPacketEntry> p);
+	int sendPacket(VisionPacketEntry p);
 	Server();
 	~Server();
 

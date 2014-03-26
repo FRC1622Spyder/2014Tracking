@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include <stdlib.h>
 #include "Vision.h"
+#include "config.h"
 
 Vision::Vision()
 {
@@ -121,7 +122,7 @@ void Vision::filterContours()
 				approxPolyDP( Mat(this->contours[i]), this->contours_poly[i], 3, true );
 				this->boundRect[i] = boundingRect( Mat(this->contours_poly[i]) );
 			}
-
+#ifndef EXTRA_OBJECTS
 			for(unsigned int j = 0; j < this->contours.size(); j++) // trim the extraneous bounding boxes
 			{
 				while(((this->bBoxBand.high < this->boundRect[j].area()) ||	(this->bBoxBand.low > this->boundRect[j].area())) 
@@ -142,6 +143,7 @@ void Vision::filterContours()
 					this->boundRect.erase(this->boundRect.begin()+j);
 				}
 			}
+#endif
 		}
 	}
 	catch(Exception &e)
