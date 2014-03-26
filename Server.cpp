@@ -151,11 +151,7 @@ int Server::sendPacket(vector<VisionPacketEntry> p)
 		;
 	string buf = ss.str();
 	this->sendBuf = buf.c_str();
-<<<<<<< HEAD
 	this->sendBufLen = buf.length()*sizeof(char);
-=======
-	this->sendBufLen = buf.length();
->>>>>>> 8f0654a5cafcbf3cde32e69dcfe59de52cbd6e4e
 	this->respond();
 	//this->Listen();
 	//this->Accept();
