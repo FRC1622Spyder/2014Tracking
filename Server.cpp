@@ -141,31 +141,38 @@ int Server::sendPacket(VisionPacketEntry p)
 	/// field names are 4 bytes wide, and are followed immedately by the length of the data string they tag. 
 	/// the tag is a fixed width of 3 bytes. the data follows a delimiter (a colin) to seperate the size tag
 	/// and the data. any empty space is '0' filled.
+
+	///sample data string:
+	/// 00ID01T0xCen005T366.5yCen005T283.5area003T143rXCe008T0.145313rYCe005T0.515
+	///  The first triad will read "ID10T" for any ID with 10 characters. 
+	///  If we do manage to get over a billion objects, someone was quite the ID10T 
+	///  with the filtering.
+
 	ss 
 		<<  setfill('0') << right //fill right of data with '0'
 		
 		<< setw(4) << "ID"
-		<< setw(3) << idLen << ":"
+		<< setw(2) << idLen << "T"
 		<< setw(idLen) << p.id 
 		
 		<< setw(4) << "xCen"
-		<< setw(3) << cXLen << ":"
+		<< setw(2) << cXLen << "T"
 		<< setw(cXLen) << p.centerX
 		
 		<< setw(4) << "yCen"
-		<< setw(3) << cYLen << ":"
+		<< setw(2) << cYLen << "T"
 		<< setw(cYLen) << p.centerY
 		
 		<< setw(4) << "area"
-		<< setw(3) << areaLen << ":"
+		<< setw(2) << areaLen << "T"
 		<< setw(areaLen) << p.area
 		
 		<< setw(4) << "rXCe"
-		<< setw(3) << cRXLen << ":"
+		<< setw(2) << cRXLen << "T"
 		<< setw(cRXLen) << p.rCenterX
 		
 		<< setw(4) << "rYCe"
-		<< setw(3) << cRYLen << ":"
+		<< setw(2) << cRYLen << "T"
 		<< setw(cRYLen) << p.rCenterY 
 		
 		<< endl
