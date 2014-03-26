@@ -99,7 +99,11 @@ int Server::Recv()
 int Server::respond()
 {
 	//send contents of sendBuf.
+<<<<<<< HEAD
 	int iSRes = sendto(this->sd, this->sendBuf, (int)this->sendBufLen, 0,
+=======
+	int iSRes = sendto(this->sd, (char*)&this->sendBuf, (int)this->sendBufLen, 0,
+>>>>>>> 8f0654a5cafcbf3cde32e69dcfe59de52cbd6e4e
 		(struct sockaddr*)&this->client, sizeof(this->client));
 	if(iSRes == SOCKET_ERROR)
 	{
@@ -150,7 +154,11 @@ int Server::sendPacket(vector<VisionPacketEntry> p)
 		;
 	string buf = ss.str();
 	this->sendBuf = buf.c_str();
+<<<<<<< HEAD
 	this->sendBufLen = buf.length()*sizeof(char);
+=======
+	this->sendBufLen = buf.length();
+>>>>>>> 8f0654a5cafcbf3cde32e69dcfe59de52cbd6e4e
 	this->respond();
 	//this->Listen();
 	//this->Accept();
