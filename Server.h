@@ -14,7 +14,7 @@
 
 struct VisionPacketEntry
 {
-	unsigned int id;
+	int id;
 	double centerX;
 	double centerY;
 	int area;

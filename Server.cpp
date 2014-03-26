@@ -130,29 +130,49 @@ Server::~Server()
 
 int Server::sendPacket(VisionPacketEntry p)
 {
+	size_t idLen = to_string((long double)p.id).length();//there's a better way to do this, right?
+	size_t areaLen = to_string((long double)p.area).length();
+	size_t cXLen = to_string((long double)p.centerX).length();
+	size_t cYLen = to_string((long double)p.centerY).length();
+	size_t cRXLen = to_string((long double)p.rCenterX).length();
+	size_t cRYLen = to_string((long double)p.rCenterY).length();
 	stringstream ss;
-	/// each field consists of 16 characters, first 8 for an ident,
-	/// second 8 for the value.
-	/// any remaing spaces are '0' filled.
+	/// each field consists of a name, a data length, and the data:
+	/// field names are 4 bytes wide, and are followed immedately by the length of the data string they tag. 
+	/// the tag is a fixed width of 3 bytes. the data follows a delimiter (a colin) to seperate the size tag
+	/// and the data. any empty space is '0' filled.
 	ss 
 		<<  setfill('0') << right //fill right of data with '0'
-		<< setw(8) << "ID"
-		<< setw(8) << p.id 
-		<< setw(8) << "centerX"
-		<< setw(8) << p.centerX
-		<< setw(8) << "centerY"
-		<< setw(8) << p.centerY
-		<< setw(8) << "area"
-		<< setw(8) << p.area
-		<< setw(8) << "rCenterX"
-		<< setw(9) << p.rCenterX
-		<< setw(8) << "rCenterY"
-		<< setw(9) << p.rCenterY 
+		
+		<< setw(4) << "ID"
+		<< setw(3) << idLen << ":"
+		<< setw(idLen) << p.id 
+		
+		<< setw(4) << "xCen"
+		<< setw(3) << cXLen << ":"
+		<< setw(cXLen) << p.centerX
+		
+		<< setw(4) << "yCen"
+		<< setw(3) << cYLen << ":"
+		<< setw(cYLen) << p.centerY
+		
+		<< setw(4) << "area"
+		<< setw(3) << areaLen << ":"
+		<< setw(areaLen) << p.area
+		
+		<< setw(4) << "rXCe"
+		<< setw(3) << cRXLen << ":"
+		<< setw(cRXLen) << p.rCenterX
+		
+		<< setw(4) << "rYCe"
+		<< setw(3) << cRYLen << ":"
+		<< setw(cRYLen) << p.rCenterY 
+		
 		<< endl
 		;
 	string buf = ss.str();
 	this->sendBuf = buf.c_str();
-	this->sendBufLen = buf.length()*sizeof(char);
+	this->sendBufLen = (int)(buf.length()*sizeof(char));
 	this->respond();
 	//this->Listen();
 	//this->Accept();
